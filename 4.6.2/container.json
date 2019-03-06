@@ -1,0 +1,15 @@
+{
+	"project": "gearbox",
+	"name": "adminer",
+	"version": "4.6.2",
+	"majorversion": "4.6",
+	"latest": "1",
+	"class": "admin",
+	"network": "--network gearboxnet",
+	"ports": "-p 8081:8080",
+	"volumes": "",
+	"restart": "--restart no",
+	"args": "",
+	"env": "ADMINER_VERSION"
+}
+
