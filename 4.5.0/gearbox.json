@@ -1,5 +1,6 @@
 {
-	"project": "gearbox",
+	"state": "production",
+	"organization": "gearboxworks",
 	"name": "adminer",
 	"version": "4.5.0",
 	"majorversion": "4.5",
