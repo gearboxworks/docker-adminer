@@ -1,0 +1,16 @@
+{
+	"state": "production",
+	"organization": "gearboxworks",
+	"name": "adminer",
+	"version": "4.7.6",
+	"majorversion": "4.7",
+	"latest": "",
+	"class": "admin",
+	"network": "--network gearboxnet",
+	"ports": "-P",
+	"volumes": "",
+	"restart": "--restart no",
+	"args": "",
+	"env": "ADMINER_VERSION"
+}
+
