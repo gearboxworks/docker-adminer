@@ -86,12 +86,12 @@ LOGFILE := $(LOGDIR)/$(NAME).log
 
 else
 BASEDIR := $(shell pwd)
-VERSIONS := $(sort $(filter-out ./, $(dir $(wildcard *.*/) ) ) )
+VERSIONS := $(subst /,, $(sort $(filter-out ./, $(dir $(wildcard *.*/) ) ) ) )
 #$(error TARGET_VERSION is not set)
 endif
 
 
-.PHONY: build push release clean list log inspect test create shell run start stop rm
+.PHONY: build push release clean list logs inspect test create shell run start stop rm
 
 ################################################################################
 # Image related commands.
@@ -113,7 +113,7 @@ help:
 	@echo "release		- Do all of the above."
 	@echo ""
 	@echo "info		- Generate info from runtime container image."
-	@echo "log		- Show log from last build."
+	@echo "logs		- Show logs from last build."
 	@echo "readme		- Show README.md."
 	@echo ""
 	@echo "Process:"
@@ -130,7 +130,7 @@ help-all:
 	@echo "release-all	- Do all of the above."
 	@echo ""
 	@echo "info-all	- Generate info from runtime container image."
-	@echo "log-all		- Show log from last build."
+	@echo "logs-all		- Show logs from last build."
 	@echo "readme-all	- Show README.md."
 	@echo ""
 	@echo "Process:"
@@ -171,173 +171,108 @@ endef
 # $(call check_config)
 
 
+################################################################################
 check-config:
 ifeq ($(SKIP),yes)
 	@# Used to skip images without error.
 	@exit 0
 endif
 ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Not supported yet."
 	@exit 1
 endif
 ifeq ($(TARGET_VERSION),)
-	@echo "Gearbox: ERROR - Specify a TARGET_VERSION."
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: ERROR - Specify a TARGET_VERSION."
+	@echo ""
+	@echo "Examples:"
+	@echo "make $(BUILD_TARGET)-all"
+	@$(foreach ver,$(VERSIONS), echo "make $(BUILD_TARGET) TARGET_VERSION=$(ver)";)
+	@echo ""
 	@exit 1
 endif
 ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: ERROR - You need to install JQ or NodeJS."
 	@exit 1
 endif
 	@echo > /dev/null
 
 
 ################################################################################
-
-info-all:
-	$(eval TARGET := $(subst -all, , $@))
+%-all:
+	$(eval TARGET := $*)
 	@echo "################################################################################"
-	@echo "Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
-
-clean-all:
-	$(eval TARGET := $(subst -all, , $@))
-	@echo "################################################################################"
-	@echo "Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
-
-build-all:
-	$(eval TARGET := $(subst -all, , $@))
-	@echo "################################################################################"
-	@echo "Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
-
-push-all:
-	$(eval TARGET := $(subst -all, , $@))
-	@echo "################################################################################"
-	@echo "Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
-
-release-all:
-	$(eval TARGET := $(subst -all, , $@))
-	@echo "################################################################################"
-	@echo "Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
-
-list-all:
-	$(eval TARGET := $(subst -all, , $@))
-	@echo "################################################################################"
-	@echo "Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
-
-log-all:
-	$(eval TARGET := $(subst -all, , $@))
-	@echo "################################################################################"
-	@echo "Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
-
-inspect-all:
-	$(eval TARGET := $(subst -all, , $@))
-	@echo "################################################################################"
-	@echo "Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
-
-test-all:
-	$(eval TARGET := $(subst -all, , $@))
-	@echo "################################################################################"
-	@echo "Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
+	@echo "# Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
+	@$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
 
 
 ################################################################################
-info:
-	@make info-real BUILD_TYPE="base"
-	@make info-real BUILD_TYPE="final"
-
-clean:
-	@make clean-real BUILD_TYPE="base"
-	@make clean-real BUILD_TYPE="final"
-
-build:
-	@make build-real BUILD_TYPE="base"
-	@make build-real BUILD_TYPE="final"
-
-push:
-	@make push-real BUILD_TYPE="base"
-	@make push-real BUILD_TYPE="final"
-
-release:
-	@make release-real BUILD_TYPE="base"
-	@make release-real BUILD_TYPE="final"
-
-list:
-	@make list-real BUILD_TYPE="base"
-	@make list-real BUILD_TYPE="final"
-
-log:
-	@make log-real BUILD_TYPE="base"
-	@make log-real BUILD_TYPE="final"
-
-inspect:
-	@make inspect-real BUILD_TYPE="base"
-	@make inspect-real BUILD_TYPE="final"
-
-test:
-	@make test-real BUILD_TYPE="base"
-	@make test-real BUILD_TYPE="final"
-
 readme:
 	@cat README.md
 
 
 ################################################################################
+info:
+	@make info-real BUILD_TYPE="base" BUILD_TARGET="$@"
+	@make info-real BUILD_TYPE="final" BUILD_TARGET="$@"
+
 info-%:
 	@make info-real BUILD_TYPE="$*"
+
+info-real:
+	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Container ports exposed."
+
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -q -f name=^$(CONTAINER_NAME)),)
+	docker port $(CONTAINER_NAME)
+endif
+
+endif
+
+
+################################################################################
+clean:
+	@make clean-real BUILD_TYPE="base" BUILD_TARGET="$@"
+	@make clean-real BUILD_TYPE="final" BUILD_TARGET="$@"
 
 clean-%:
 	@make clean-real BUILD_TYPE="$*"
 
+clean-real:
+	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Cleaning build."
+
+ifneq ($(SKIP),yes)
+	-@make -k rm
+
+ifneq ($(shell docker image ls -q $(IMAGE_NAME):$(VERSION)),)
+	-@docker image rm -f $(IMAGE_NAME):$(VERSION)
+endif
+
+ifneq ($(shell docker image ls -q $(IMAGE_NAME):$(VERSION)),)
+	-@docker image rm -f $(IMAGE_NAME):$(MAJORVERSION)
+endif
+
+	@rm -f $(LOGDIR)/*.log
+endif
+
+
+################################################################################
+build:
+	@make build-real BUILD_TYPE="base" BUILD_TARGET="$@"
+	@make build-real BUILD_TYPE="final" BUILD_TARGET="$@"
+
 build-%:
 	@make build-real BUILD_TYPE="$*"
 
-push-%:
-	@make push-real BUILD_TYPE="$*"
-
-release-%:
-	@make release-real BUILD_TYPE="$*"
-
-list-%:
-	@make list-real BUILD_TYPE="$*"
-
-log-%:
-	@make log-real BUILD_TYPE="$*"
-
-inspect-%:
-	@make inspect-real BUILD_TYPE="$*"
-
-test-%:
-	@make test-real BUILD_TYPE="$*"
-
-
-################################################################################
-info-real:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
-
-ifneq ($(SKIP),yes)
-	@echo "Gearbox: Not implemented yet."
-ifneq ($(MAJORVERSION),)
-	@echo "Gearbox: Not implemented yet."
-endif
-endif
-
-
-################################################################################
 build-real:
 	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Building container."
 
 ifneq ($(SKIP),yes)
-	@echo "Gearbox: Building container."
 	@script $(LOG_ARGS) $(LOGFILE) docker build -t $(IMAGE_NAME):$(VERSION) --label gearbox.json='$(call rawJSON)' --label container.organization="$(ORGANIZATION)" --label container.name="$(NAME)" --label container.version="$(VERSION)" --label container.majorversion="$(MAJORVERSION)" --label container.latest="$(LATEST)" --label container.class="$(CLASS)" --label container.network="$(NETWORK)" --label container.ports="$(PORTS)" --label container.volumes="$(VOLUMES)" --label container.restart="$(RESTART)" --label container.args="$(ARGS)" --label container.env="$(ENV)" --build-arg $(ENV)="$(VERSION)" $(BUILD_ARGS) -f $(DOCKERFILE) .
-	@echo "Gearbox: Log file saved to \"$(LOGFILE)\""
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Log file saved to \"$(LOGFILE)\""
+
 ifneq ($(MAJORVERSION),)
 	@docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):$(MAJORVERSION)
 endif
@@ -345,24 +280,45 @@ endif
 
 
 ################################################################################
+push:
+	@make push-real BUILD_TYPE="base" BUILD_TARGET="$@"
+	@make push-real BUILD_TYPE="final" BUILD_TARGET="$@"
+
+push-%:
+	@make push-real BUILD_TYPE="$*"
+
 push-real:
 	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes."
 
 ifneq ($(SKIP),yes)
-	@echo "Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes to GitHub."
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes to GitHub."
 	-@git commit -a -m "$(GIT_COMMENT)" && git push
 
+ifneq ($(shell docker image ls -q $(IMAGE_NAME):$(VERSION)),)
 	@echo "Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes to DockerHub."
 	-@docker push $(IMAGE_NAME):$(VERSION)
-ifneq ($(MAJORVERSION),)
-	docker push $(IMAGE_NAME):$(MAJORVERSION)
 endif
+
+ifneq ($(shell docker image ls -q $(IMAGE_NAME):$(MAJORVERSION)),)
+	@echo "Gearbox[$(IMAGE_NAME):$(MAJORVERSION)]: Pushing changes to DockerHub."
+	-@docker push $(IMAGE_NAME):$(MAJORVERSION)
+endif
+
 endif
 
 
 ################################################################################
+release:
+	@make release-real BUILD_TYPE="base" BUILD_TARGET="$@"
+	@make release-real BUILD_TYPE="final" BUILD_TARGET="$@"
+
+release-%:
+	@make release-real BUILD_TYPE="$*"
+
 release-real: build
 	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Full release cycle."
 
 ifneq ($(SKIP),yes)
 	# @make clean-base
@@ -376,33 +332,40 @@ endif
 
 
 ################################################################################
-clean-real:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+list:
+	@make list-real BUILD_TYPE="base" BUILD_TARGET="$@"
+	@make list-real BUILD_TYPE="final" BUILD_TARGET="$@"
 
-ifneq ($(SKIP),yes)
-	-docker image rm -f $(IMAGE_NAME):$(VERSION)
-ifneq ($(MAJORVERSION),)
-	-docker image rm -f $(IMAGE_NAME):$(MAJORVERSION)
-endif
-	@rm -f $(LOGDIR)/*.log
-endif
+list-%:
+	@make list-real BUILD_TYPE="$*"
 
-
-################################################################################
 list-real:
 	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: List image."
 
 ifneq ($(SKIP),yes)
-	docker image ls $(IMAGE_NAME):$(VERSION)
-ifneq ($(MAJORVERSION),)
-	docker image ls $(IMAGE_NAME):$(MAJORVERSION)
+ifneq ($(shell docker image ls -q $(IMAGE_NAME):$(VERSION)),)
+	@docker image ls $(IMAGE_NAME):$(VERSION)
 endif
+
+ifneq ($(shell docker image ls -q $(IMAGE_NAME):$(MAJORVERSION)),)
+	@docker image ls $(IMAGE_NAME):$(MAJORVERSION)
+endif
+
 endif
 
 
 ################################################################################
-log-real:
+logs:
+	@make logs-real BUILD_TYPE="base" BUILD_TARGET="$@"
+	@make logs-real BUILD_TYPE="final" BUILD_TARGET="$@"
+
+logs-%:
+	@make logs-real BUILD_TYPE="$*"
+
+logs-real:
 	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Show build logs."
 
 ifneq ($(SKIP),yes)
 	@if [ -f "$(LOGFILE)" ]; then script -dp $(LOGFILE) | less -SinR; fi
@@ -410,80 +373,200 @@ endif
 
 
 ################################################################################
+inspect:
+	@make inspect-real BUILD_TYPE="base" BUILD_TARGET="$@"
+	@make inspect-real BUILD_TYPE="final" BUILD_TARGET="$@"
+
+inspect-%:
+	@make inspect-real BUILD_TYPE="$*"
+
 inspect-real:
 	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Show Docker inspect."
 
 ifneq ($(SKIP),yes)
-	docker image inspect $(IMAGE_NAME):$(VERSION)
+ifneq ($(shell docker image ls -q $(IMAGE_NAME):$(VERSION)),)
+	@docker image inspect $(IMAGE_NAME):$(VERSION)
+endif
+
+ifneq ($(shell docker image ls -q $(IMAGE_NAME):$(MAJORVERSION)),)
+	@docker image inspect $(IMAGE_NAME):$(MAJORVERSION)
+endif
+
 endif
 
 
 ################################################################################
+test:
+	@make test-real BUILD_TYPE="base" BUILD_TARGET="$@"
+	@make test-real BUILD_TYPE="final" BUILD_TARGET="$@"
+
+#test-all:
+#	$(eval TARGET := $(subst -all, , $@))
+#	@echo "################################################################################"
+#	@echo "# Gearbox: Running '$(TARGET)' for versions: $(VERSIONS)"
+#	@$(foreach ver,$(VERSIONS), make -C $(BASEDIR) TARGET_VERSION=$(ver) $(TARGET);)
+
+test-%:
+	@make test-real BUILD_TYPE="$*"
+
 test-real:
 	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@echo "# Gearbox[$(IMAGE_NAME):$(VERSION)]: Running unit tests for image."
 
 ifneq ($(SKIP),yes)
-	@echo "Running unit tests for container."
-	@#echo "Unit tests not defined for this container."
 	-@make -k stop
 	-@make -k rm
-	@make create
-	@make start
-	@make test-ssh
+	-@make create
+	-@make start
+	-@make testssh
 endif
 
 
 ################################################################################
 # Container related commands.
-
 create:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
-	docker create --name $(CONTAINER_NAME) $(RESTART)  $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION)
+	@make check-config BUILD_TYPE=$(BUILD_TYPE) BUILD_TARGET="$@"
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Creating container."
 
-
-################################################################################
-shell:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
-	docker run --rm --name $(CONTAINER_NAME)-shell -i -t $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION) /bin/bash -l
-
-
-################################################################################
-test-ssh:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
-	$(eval PORT := $(shell docker port $(CONTAINER_NAME) 22/tcp | sed 's/0.0.0.0://'))
-	ssh -p $(PORT) gearbox@localhost /etc/gearbox/unit-tests/run.sh
-
-
-################################################################################
-ssh:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
-	$(eval PORT := $(shell docker port $(CONTAINER_NAME) 22/tcp | sed 's/0.0.0.0://'))
-	ssh -p $(PORT) gearbox@localhost
-
-
-################################################################################
-run:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
-	docker run --rm --name $(CONTAINER_NAME) $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION)
-
-
-################################################################################
-start:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
-	docker start $(CONTAINER_NAME)
-
-
-################################################################################
-stop:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
-	docker stop $(CONTAINER_NAME)
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -q -a -f name="^$(CONTAINER_NAME)"),)
+	docker create --name $(CONTAINER_NAME) $(RESTART) $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION)
+else ifeq ($(shell docker container ls -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container already exists and running."
+else
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container already exists and shutdown."
+endif
+endif
 
 
 ################################################################################
 rm:
-	@make check-config BUILD_TYPE=$(BUILD_TYPE)
+	@make check-config BUILD_TYPE=$(BUILD_TYPE) BUILD_TARGET="$@"
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Removing container."
+
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -q -a -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container doesn't exist. No need to remove anything."
+else ifeq ($(shell docker container ls -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container running. Please shutdown first."
+else
 	docker container rm -f $(CONTAINER_NAME)
+endif
+endif
 
 
 ################################################################################
+start:
+	@make check-config BUILD_TYPE=$(BUILD_TYPE) BUILD_TARGET="$@"
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Starting container."
+
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -a -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container doesn't exist. Please create one."
+else ifeq ($(shell docker container ls -q -f name="^$(CONTAINER_NAME)"),)
+	docker start $(CONTAINER_NAME)
+else
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container already started. Nothing to do."
+endif
+endif
+
+
+################################################################################
+stop:
+	@make check-config BUILD_TYPE=$(BUILD_TYPE) BUILD_TARGET="$@"
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Stopping container."
+
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -a -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container doesn't exist. Please create one."
+else ifeq ($(shell docker container ls -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container already stopped. Nothing to do."
+else
+	docker stop $(CONTAINER_NAME)
+endif
+endif
+
+
+################################################################################
+run:
+	@make check-config BUILD_TYPE=$(BUILD_TYPE) BUILD_TARGET="$@"
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Running shell in existing container."
+
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -a -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container doesn't exist. Please create one."
+else ifeq ($(shell docker container ls -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container exists, but not started. Please start."
+else
+	docker exec -i -t $(CONTAINER_NAME) /bin/bash -l
+endif
+endif
+
+
+################################################################################
+exec:
+	@make check-config BUILD_TYPE=$(BUILD_TYPE) BUILD_TARGET="$@"
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Running shell in a new container."
+
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -a -q -f name="^$(CONTAINER_NAME)"),)
+	@docker run --rm --name $(CONTAINER_NAME) $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION)
+else ifeq ($(shell docker container ls -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container already exists and shutdown. Please remove."
+else
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container already exists and running. Please shutdown and remove."
+endif
+endif
+
+
+################################################################################
+testssh:
+	@make check-config BUILD_TYPE=$(BUILD_TYPE) BUILD_TARGET="$@"
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Testing container SSH."
+
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -q -a -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container doesn't exist. Please create one."
+else ifeq ($(shell docker container ls -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container exists, but shutdown. Please start."
+else
+	@$(eval PORT := $(shell docker port $(CONTAINER_NAME) 22/tcp | sed 's/0.0.0.0://'))
+	ssh -p $(PORT) gearbox@localhost /etc/gearbox/unit-tests/run.sh
+endif
+endif
+
+
+################################################################################
+ssh:
+	@make check-config BUILD_TYPE=$(BUILD_TYPE) BUILD_TARGET="$@"
+	@echo "# Gearbox[$(CONTAINER_NAME)]: SSH into container."
+
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -q -a -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container doesn't exist. Please create one."
+else ifeq ($(shell docker container ls -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container exists, but shutdown. Please start."
+else
+	@$(eval PORT := $(shell docker port $(CONTAINER_NAME) 22/tcp | sed 's/0.0.0.0://'))
+	ssh -p $(PORT) gearbox@localhost
+endif
+endif
+
+
+################################################################################
+ports:
+	@make check-config BUILD_TYPE=$(BUILD_TYPE) BUILD_TARGET="$@"
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Exposed container ports."
+
+ifneq ($(SKIP),yes)
+ifeq ($(shell docker container ls -q -a -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container doesn't exist. Please create one."
+else ifeq ($(shell docker container ls -q -f name="^$(CONTAINER_NAME)"),)
+	@echo "# Gearbox[$(CONTAINER_NAME)]: Container exists, but shutdown. Please start."
+else
+	@docker port $(CONTAINER_NAME)
+endif
+endif
+
 
