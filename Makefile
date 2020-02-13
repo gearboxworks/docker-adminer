@@ -349,10 +349,12 @@ push-real:
 	@make check-config BUILD_TYPE=$(BUILD_TYPE)
 
 ifneq ($(SKIP),yes)
-	@if [ -d .git ]; then echo "Gearbox: Pushing changes to GitHub."; git commit -m "Release commit." . && git push; fi
+	@echo "Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes to GitHub."
+	@git commit -m "Release commit."
+	@git push
 
-	@echo "Gearbox: Pushing changes to DockerHub."
-	-docker push $(IMAGE_NAME):$(VERSION)
+	@echo "Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes to DockerHub."
+	-@docker push $(IMAGE_NAME):$(VERSION)
 ifneq ($(MAJORVERSION),)
 	docker push $(IMAGE_NAME):$(MAJORVERSION)
 endif
