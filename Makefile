@@ -350,8 +350,7 @@ push-real:
 
 ifneq ($(SKIP),yes)
 	@echo "Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes to GitHub."
-	@git commit -m "Release commit."
-	-@git push
+	-@git commit -a -m "Release commit." && git push
 
 	@echo "Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes to DockerHub."
 	-@docker push $(IMAGE_NAME):$(VERSION)
