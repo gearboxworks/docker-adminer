@@ -30,5 +30,6 @@ RUN /bin/sh /build/build-adminer.sh
 
 # 8. Expose ports.
 EXPOSE 22 8081 9970
+WORKDIR /home/gearbox
 
 CMD ["/init"]
