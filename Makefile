@@ -60,7 +60,7 @@ RESTART		:= $(call GetFromPkg,restart)
 ARGS		:= $(call GetFromPkg,args)
 STATE		:= $(call GetFromPkg,state)
 ENV		:= $(call GetFromPkg,env)
-COMMENT		:= Release commit.
+GIT_COMMENT	:= Release $(TARGET_VERSION) commit.
 
 # The critical bit. Determines what Dockerfile to build against.
 ifeq ($(BUILD_TYPE),base)
@@ -350,7 +350,7 @@ push-real:
 
 ifneq ($(SKIP),yes)
 	@echo "Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes to GitHub."
-	-@git commit -a -m "Release commit." && git push
+	-@git commit -a -m "$(GIT_COMMENT)" && git push
 
 	@echo "Gearbox[$(IMAGE_NAME):$(VERSION)]: Pushing changes to DockerHub."
 	-@docker push $(IMAGE_NAME):$(VERSION)
