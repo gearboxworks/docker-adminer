@@ -1,21 +1,18 @@
 ![release](https://github.com/gearboxworks/docker-adminer/workflows/release/badge.svg?event=release)
 
-![Adminer 4.6.x](https://img.shields.io/badge/Adminer-4.6.x-green.svg)
-![Adminer 4.5.x](https://img.shields.io/badge/Adminer-4.5.x-green.svg)
+![Adminer 4.7.x](https://img.shields.io/badge/Adminer-4.6.x-green.svg)
 
 ![Gearbox](https://github.com/gearboxworks/gearbox.github.io/raw/master/Gearbox-100x.png)
 
 
 # Adminer Docker Container for Gearbox
 This is the repository for the [Adminer](https://www.adminer.org/) Docker container implemented for [Gearbox](https://github.com/gearboxworks/gearbox).
-It currently provides versions 4.5.x 4.6.x
+It currently provides versions 4.7.x
 
 
 ## Supported tags and respective Dockerfiles
 
-`4.6.2`, `4.6`, `latest` _([4.6.2/Dockerfile](https://github.com/gearboxworks/adminer-docker/blob/master/4.6.2/Dockerfile))_
-
-`4.5.0`, `4.5` _([4.5.0/Dockerfile](https://github.com/gearboxworks/adminer-docker/blob/master/4.5.0/Dockerfile))_
+`4.7.2`, `4.7`, `latest` _([4.7.2/Dockerfile](https://github.com/gearboxworks/adminer-docker/blob/master/4.7.2/Dockerfile))_
 
 
 ## Using this container.
@@ -38,23 +35,23 @@ A simple `docker pull gearbox/adminer` will pull down the latest version.
 ### Runtime from Docker Hub
 start - Spin up a Docker container with the correct runtime configs.
 
-`docker run -d --name adminer-4.6.2 --restart unless-stopped --network gearboxnet -p 8081:8080  gearbox/adminer:4.6.2`
+`docker run -d --name adminer-latest --restart unless-stopped --network gearboxnet -p 8081:8080  gearbox/adminer:latest`
 
 stop - Stop a Docker container.
 
-`docker stop adminer-4.6.2`
+`docker stop adminer-latest`
 
 run - Run a Docker container in the foreground, (all STDOUT and STDERR will go to console). The Container be removed on termination.
 
-`docker run --rm --name adminer-4.6.2 --network gearboxnet -p 8081:8080  gearbox/adminer:4.6.2`
+`docker run --rm --name adminer-latest --network gearboxnet -p 8081:8080  gearbox/adminer:latest`
 
 shell - Run a shell, (/bin/bash), within a Docker container.
 
-`docker run --rm --name adminer-4.6.2 -i -t --network gearboxnet -p 8081:8080  gearbox/adminer:4.6.2 /bin/bash`
+`docker run --rm --name adminer-latest -i -t --network gearboxnet -p 8081:8080  gearbox/adminer:latest /bin/bash`
 
 rm - Remove the Docker container.
 
-`docker container rm adminer-4.6.2`
+`docker container rm adminer-latest`
 
 
 ## Using it from GitHub repo
