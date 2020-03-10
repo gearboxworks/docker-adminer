@@ -1,3 +1,5 @@
+![release](https://github.com/gearboxworks/docker-adminer/workflows/release/badge.svg?event=release)
+
 ![Adminer 4.6.x](https://img.shields.io/badge/Adminer-4.6.x-green.svg)
 ![Adminer 4.5.x](https://img.shields.io/badge/Adminer-4.5.x-green.svg)
 
