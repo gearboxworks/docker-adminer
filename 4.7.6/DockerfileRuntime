@@ -1,11 +1,14 @@
-# This image doesn't use Alpine as the base, so we are going to reference the gearbox-base container indirectly.
+################################################################################
+# Created on 2020-02-15T11:24:23+1100, using template:DockerfileRuntime.tmpl and json:gearbox.json
+
+# Referenced Docker container for docker-adminer based off gearboxworks/gearbox-base:alpine-3.9 with adminer:4.7.6 overlayed.
 ARG VERSION=4.7.6
 
 # 1. First reference the gearbox-base image.
 FROM gearboxworks/gearbox-base:alpine-3.9 as gearbox-base
 
 # 2. Next reference the third party image.
-FROM adminer:${VERSION}
+FROM adminer:4.7.6
 ARG VERSION
 USER root
 
@@ -15,7 +18,7 @@ COPY --from=gearbox-base /build /build
 # 4. Set up env variables.
 MAINTAINER Gearbox Team <team@gearbox.works>
 ENV GEARBOX_CONTAINER_NAME "docker-adminer"
-ENV GEARBOX_CONTAINER_VERSION $VERSION
+ENV GEARBOX_CONTAINER_VERSION ${VERSION}
 
 # 5. Now copy the local files specific to this container.
 COPY build /build
@@ -25,11 +28,13 @@ COPY ${VERSION}/gearbox.json /build/gearbox.json
 # 6. Run the build-base.sh script to set everything up.
 RUN /bin/sh /build/build-base.sh
 
-# 7. Run the build-nginx.sh script to set everything up.
+# 7. Run the build-adminer.sh script to set everything up.
 RUN /bin/sh /build/build-adminer.sh
 
 # 8. Expose ports.
-EXPOSE 22 8081 9970
-WORKDIR /home/gearbox
+EXPOSE 22 9970 8081 
+WORKDIR /home/gearbox/projects
 
 CMD ["/init"]
+
+# END
