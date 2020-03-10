@@ -1,8 +1,0 @@
-#!/bin/bash
-echo "Adminer started"
-
-export DB_USERNAME="gearbox"
-export DB_PASSWORD="gearbox"
-
-su - adminer -s /bin/bash -c "DB_USERNAME='gearbox' DB_PASSWORD='gearbox' /usr/local/bin/php -S '[::]:8080' -t /var/www/html"
-

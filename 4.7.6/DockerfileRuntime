@@ -1,7 +1,9 @@
-################################################################################
-# Created on 2020-02-15T11:24:23+1100, using template:DockerfileRuntime.tmpl and json:gearbox.json
 
+################################################################################
+# WARNING: This file has been auto-generated. DO NOT EDIT: WARNING
+# Created on 2020-03-11T07:32:42+1100, using template:DockerfileRuntime.tmpl and json:gearbox.json
 # Referenced Docker container for docker-adminer based off gearboxworks/gearbox-base:alpine-3.9 with adminer:4.7.6 overlayed.
+
 ARG VERSION=4.7.6
 
 # 1. First reference the gearbox-base image.
@@ -10,26 +12,65 @@ FROM gearboxworks/gearbox-base:alpine-3.9 as gearbox-base
 # 2. Next reference the third party image.
 FROM adminer:4.7.6
 ARG VERSION
+ARG GEARBOX_ENTRYPOINT
 USER root
 
 # 3. Copy the build directory over from gearbox-base image.
-COPY --from=gearbox-base /build /build
+COPY --from=gearbox-base /etc/gearbox /etc/gearbox
 
 # 4. Set up env variables.
 MAINTAINER Gearbox Team <team@gearbox.works>
 ENV GEARBOX_CONTAINER_NAME "docker-adminer"
 ENV GEARBOX_CONTAINER_VERSION ${VERSION}
+ENV GEARBOX_ENTRYPOINT ${GEARBOX_ENTRYPOINT}
+LABEL gearbox.json='{"state": "production","organization": "gearboxworks","name": "adminer","maintainer": "Gearbox Team <team@gearbox.works>","version": "4.7.6","majorversion": "4.7","latest": "","class": "admin","network": "--network gearboxnet","ports": ["8081"],"volumes": "","restart": "--restart no","args": "","env": {"ADMINER_USER": "gearbox"},"ref": "adminer:4.7.6","base": "gearboxworks/gearbox-base:alpine-3.9"}'
+LABEL container.args=""
+LABEL container.base="gearboxworks/gearbox-base:alpine-3.9"
+LABEL container.class="admin"
+LABEL container.env="map[ADMINER_USER:gearbox]"
+LABEL container.latest=""
+LABEL container.maintainer="Gearbox Team <team@gearbox.works>"
+LABEL container.majorversion="4.7"
+LABEL container.name="adminer"
+LABEL container.network="--network gearboxnet"
+LABEL container.organization="gearboxworks"
+LABEL container.ports="[8081]"
+LABEL container.ref="adminer:4.7.6"
+LABEL container.restart="--restart no"
+LABEL container.state="production"
+LABEL container.version="4.7.6"
+LABEL container.volumes=""
+
+ENV GEARBOX_ARGS ""
+ENV GEARBOX_BASE "gearboxworks/gearbox-base:alpine-3.9"
+ENV GEARBOX_CLASS "admin"
+# ENV GEARBOX_ENV "map[ADMINER_USER:gearbox]"
+ENV GEARBOX_LATEST ""
+ENV GEARBOX_MAINTAINER "Gearbox Team <team@gearbox.works>"
+ENV GEARBOX_MAJORVERSION "4.7"
+ENV GEARBOX_NAME "adminer"
+ENV GEARBOX_NETWORK "--network gearboxnet"
+ENV GEARBOX_ORGANIZATION "gearboxworks"
+ENV GEARBOX_PORTS "[8081]"
+ENV GEARBOX_REF "adminer:4.7.6"
+ENV GEARBOX_RESTART "--restart no"
+ENV GEARBOX_STATE "production"
+ENV GEARBOX_VERSION "4.7.6"
+ENV GEARBOX_VOLUMES ""
+
+ENV ADMINER_USER "gearbox"
+
 
 # 5. Now copy the local files specific to this container.
-COPY build /build
-COPY ${VERSION}/build /build
-COPY ${VERSION}/gearbox.json /build/gearbox.json
+COPY build /etc/gearbox
+COPY ${VERSION}/build /etc/gearbox
+COPY ${VERSION}/gearbox.json /etc/gearbox/gearbox.json
 
-# 6. Run the build-base.sh script to set everything up.
-RUN /bin/sh /build/build-base.sh
+# 6. Run the base.sh script to set everything up.
+RUN /bin/sh /etc/gearbox/build/base.sh
 
-# 7. Run the build-adminer.sh script to set everything up.
-RUN /bin/sh /build/build-adminer.sh
+# 7. Run the adminer.sh script to set everything up.
+RUN /bin/sh /etc/gearbox/build/adminer.sh
 
 # 8. Expose ports.
 EXPOSE 22 9970 8081 
@@ -38,3 +79,6 @@ WORKDIR /home/gearbox/projects
 CMD ["/init"]
 
 # END
+################################################################################
+
+

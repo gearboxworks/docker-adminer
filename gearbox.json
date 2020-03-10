@@ -15,8 +15,7 @@
 	"restart": "--restart no",
 	"args": "",
 	"env": {
-		"DB_USERNAME": "gearbox",
-		"DB_PASSWORD": "gearbox"
+		"ADMINER_USER": "gearbox"
 	},
 	"ref": "adminer:4.7.6",
 	"base": "gearboxworks/gearbox-base:alpine-3.9"
