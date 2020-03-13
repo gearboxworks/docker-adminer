@@ -14,7 +14,7 @@ GitHub release(latest): ![last-release-date](https://img.shields.io/github/relea
 ## Supported versions and respective Dockerfiles
 | Service | GitHub Version | Docker Version | Docker Size | Docker Tags | Dockerfile |
 | ------- | -------------- | -------------- | ----------- | ----------- | ---------- |
-| [adminer](https://www.adminer.org/) | ![adminer](https://img.shields.io/badge/adminer-4.7.6-green.svg) | ![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/gearboxworks/adminer/4.7.6) | ![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/adminer/4.7.6) | `4.7.6`, `4.7`, `latest` | _([4.7.6/DockerfileRuntime](https://github.com/gearboxworks/docker-adminer/blob/master/4.7.6/DockerfileRuntime))_ |
+| [adminer](https://www.adminer.org/) | ![adminer](https://img.shields.io/badge/adminer-4.7.6-green.svg) | ![Docker Version)](https://img.shields.io/docker/v/gearboxworks/adminer/4.7.6) | ![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/adminer/4.7.6) | `4.7.6`, `4.7`, `latest` | _([4.7.6/DockerfileRuntime](https://github.com/gearboxworks/docker-adminer/blob/master/4.7/DockerfileRuntime))_ |
 
 
 
