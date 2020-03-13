@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created on 2020-03-11T07:32:42+1100, using template:02-release.sh.tmpl and json:gearbox.json
+# Created on 2020-03-13T14:27:15+1100, using template:02-release.sh.tmpl and json:gearbox.json
 
 p_info "adminer-4.7.6" "Release test started."
 

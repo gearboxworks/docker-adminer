@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created on 2020-03-11T07:50:04+1100, using template:adminer.sh.tmpl and json:gearbox.json
+# Created on 2020-03-13T14:18:47+1100, using template:adminer.sh.tmpl and json:gearbox.json
 
 test -f /etc/gearbox/bin/colors.sh && . /etc/gearbox/bin/colors.sh
 
@@ -21,7 +21,5 @@ if [ ! -d /usr/local/bin ]
 then
 	mkdir -p /usr/local/bin; checkExit
 fi
-
-chown -fhR adminer:adminer /var/www/
 
 c_ok "Finished."
