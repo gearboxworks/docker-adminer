@@ -10,7 +10,7 @@ GB_BINDIR="$(./bin/JsonToConfig -json-string '{}' -template-string '{{ .DirPath 
 GB_BASEDIR="$(dirname "$GB_BINDIR")"
 GB_JSONFILE="${GB_BASEDIR}/gearbox.json"
 
-GB_VERSIONS="$(${GB_BINFILE} -json ${GB_JSONFILE} -template-string '{{ range $version, $value := .Json.versions }}{{ $version }}{{ end }}')"
+GB_VERSIONS="$(${GB_BINFILE} -json ${GB_JSONFILE} -template-string '{{ range $version, $value := .Json.versions }}{{ $version }} {{ end }}')"
 GB_VERSIONS="$(echo ${GB_VERSIONS})"	# Easily remove CR
 
 GITBIN="$(which git)"
@@ -72,7 +72,7 @@ _getVersions() {
 ################################################################################
 _listVersions() {
 	echo "	all - All versions"
-	${GB_BINFILE} -json ${GB_JSONFILE} -template-string '{{ range $version, $value := .Json.versions }}\t{{ $version }} - {{ $.Json.organization }}/{{ $.Json.name }}:{{ $version }}{{ end }}'
+	${GB_BINFILE} -json ${GB_JSONFILE} -template-string '{{ range $version, $value := .Json.versions }}\t{{ $version }} - {{ $.Json.organization }}/{{ $.Json.name }}:{{ $version }}\n{{ end }}'
 	echo ""
 }
 
@@ -164,7 +164,7 @@ gb_create-build() {
 	if [ -d build ]
 	then
 		p_warn "${FUNCNAME[0]}" "Directory \"build\" already exists."
-		return 1
+		return 0
 	fi
 
 	cp -i TEMPLATE/build.sh.tmpl .
@@ -186,20 +186,20 @@ gb_create-version() {
 	p_ok "${FUNCNAME[0]}" "Creating version directory for versions: ${GB_VERSIONS}"
 
 
+	${GB_BINFILE} -template ./TEMPLATE/README.md.tmpl -json ${GB_JSONFILE} -out README.md
+
 	for GB_VERSION in ${GB_VERSIONS}
 	do
 		if [ -d ${GB_VERSION} ]
 		then
-			p_warn "${FUNCNAME[0]}" "Directory \"${GB_VERSIONS}\" already exists."
+			p_warn "${FUNCNAME[0]}" "Directory \"${GB_VERSION}\" already exists."
 		else
-			p_info "${FUNCNAME[0]}" "Creating version directory \"${GB_VERSIONS}\"."
+			p_info "${FUNCNAME[0]}" "Creating version directory \"${GB_VERSION}\"."
 			cp -i TEMPLATE/version.sh.tmpl .
 			${GB_BINFILE} -json ${GB_JSONFILE} -create version.sh.tmpl -shell
 			rm -f version.sh.tmpl version.sh
 		fi
 	done
-
-	${GB_BINFILE} -template ./TEMPLATE/README.md.tmpl -json ${GB_JSONFILE} -out README.md
 
 	return 0
 }
@@ -288,7 +288,6 @@ gb_build() {
 			;;
 	esac
 
-
 	for GB_VERSION in ${GB_VERSIONS}
 	do
 		gb_getenv ${GB_VERSION}
@@ -306,7 +305,7 @@ gb_build() {
 			p_info "${GB_IMAGENAME}:${GB_VERSION}" "Pull ref container."
 			docker pull "${GB_REF}"
 			p_info "${GB_IMAGENAME}:${GB_VERSION}" "Query ref container."
-			GEARBOX_ENTRYPOINT="$(docker inspect --format '{{ index .ContainerConfig.Entrypoint 0 }}' "${GB_REF}")"
+			GEARBOX_ENTRYPOINT="$(docker inspect --format '{{ with .ContainerConfig.Entrypoint}} {{ index . 0 }}{{ end }}' "${GB_REF}")"
 			export GEARBOX_ENTRYPOINT
 			GEARBOX_ENTRYPOINT_ARGS="$(docker inspect --format '{{ join .ContainerConfig.Entrypoint " " }}' "${GB_REF}")"
 			export GEARBOX_ENTRYPOINT_ARGS

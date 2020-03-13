@@ -1,12 +1,15 @@
 #!/bin/bash
 # {{ .CreationWarning }}
 # {{ .CreationInfo }}
-{{ if not .Json.name }}
-# No name
+{{ $version := FindInMap .Json.versions .Env.GB_VERSION }}
+{{ if not $version }}
+# No version found in gearbox.json
+
+{{ else if not .Json.name }}
+# No name found in gearbox.json
 
 {{ else }}
-{{ range $key, $value := .Json.versions }}
-VERSION="{{ $key }}"
+VERSION="{{ .Env.GB_VERSION }}"
 export VERSION
 
 if [ -d "${VERSION}" ]
@@ -57,6 +60,5 @@ done
 
 find ${VERSION}/rootfs/etc/gearbox/services -type f | xargs chmod 755
 find ${VERSION}/ -name '*\.sh' | xargs chmod 755
-{{ end }}
 {{ end }}
 # END
