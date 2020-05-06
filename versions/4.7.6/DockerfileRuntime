@@ -1,7 +1,7 @@
 
 ################################################################################
 # WARNING: This file has been auto-generated. DO NOT EDIT: WARNING
-# Created on 2020-04-03T18:43:55+1100, using template:DockerfileRuntime.tmpl and json:gearbox.json
+# Created on 2020-05-06T18:32:43+1000, using template:DockerfileRuntime.tmpl and json:gearbox.json
 # Referenced Docker container for docker-adminer based off gearboxworks/gearbox-base:alpine-3.9 with adminer:4.7.6 overlayed.
 
 ARG VERSION=4.7.6
@@ -25,7 +25,7 @@ ENV GEARBOX_CONTAINER_NAME "docker-adminer"
 ENV GEARBOX_CONTAINER_VERSION ${VERSION}
 ENV GEARBOX_ENTRYPOINT ${GEARBOX_ENTRYPOINT}
 ENV GEARBOX_ENTRYPOINT_ARGS ${GEARBOX_ENTRYPOINT_ARGS}
-LABEL gearbox.json='{"schema": "gear-1","meta": {"state": "production","organization": "gearboxworks","name": "adminer","label": "Adminer","maintainer": "Gearbox Team <team@gearbox.works>","class": "admin","refurl": "https://www.adminer.org/"},"build": {"ports": {"http": "80"},"run": "","args": "/usr/local/bin/php -S 0.0.0.0:80 -t /var/www/html","env": {"ADMINER_USER": "gearbox"},"network": "--network gearboxnet","volumes": "","restart": "--restart no"},"run": {},"project": {},"extensions": {},"versions": {"4.7.6": {"majorversion": "4.7","latest": true,"ref": "adminer:4.7.6","base": "gearboxworks/gearbox-base:alpine-3.9"},"": {}}}'
+LABEL gearbox.json='{"schema": "gear-1","meta": {"state": "production","organization": "gearboxworks","name": "adminer","label": "Adminer","maintainer": "Gearbox Team <team@gearbox.works>","class": "admin","refurl": "https://www.adminer.org/"},"build": {"ports": {"http": "80"},"run": "","args": "/usr/local/bin/php -S 0.0.0.0:80 -t /var/www/html","env": {"ADMINER_USER": "gearbox"},"network": "--network gearboxnet","volumes": "","restart": "--restart no"},"run": {"commands": {"default": ""}},"project": {},"extensions": {},"versions": {"4.7.6": {"majorversion": "4.7","latest": true,"ref": "adminer:4.7.6","base": "gearboxworks/gearbox-base:alpine-3.9"},"": {}}}'
 LABEL gearbox.version='4.7.6'
 ENV GEARBOX_VERSION "4.7.6"
 LABEL container.class="admin"
